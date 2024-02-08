@@ -1,19 +1,88 @@
-from typing import Union
+from zipfile import ZipFile, ZipInfo
 from fastapi import FastAPI
+from time import time
+import uvicorn
+import csv
+import requests
+from sqlalchemy import Column, Integer, VARCHAR
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 app = FastAPI()
 
+url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
+query_parameters = {"downloadformat": "csv"}
+result = []
+
+Base = DeclarativeBase()
+
+
+def download_zip(link, parameters):
+    file_name = "postalcode"
+    response = requests.get(link, params=parameters)
+    with open(f"{file_name}.zip", mode="wb") as file:
+        file.write(response.content)
+        file.close()
+    with ZipFile(f"{file_name}.zip", 'r') as zip:
+        zipinfo = zip.infolist()
+        for item in zipinfo:
+            if item.filename.endswith('.csv'):
+                csv_file_name = item.filename
+                break
+
+        if csv_file_name is not None:
+            print('Extracting all the files now...')
+            zip.extractall()  # Extracting all files
+            print('Done!')
+        else:
+            print("No CSV file found in the ZIP.")
+    return csv_file_name
+
+
+class PostalCode(Base):
+    __tablename__ = 'Japan Postal Code'
+    id = Column(Integer, primary_key=True, nullable=False)
+    state = Column(VARCHAR)
+    city = Column(VARCHAR)
+    address = Column(VARCHAR)
+
+
+def create_db():
+    engine = create_engine('sqlite:///postalcode.db')
+    Base.metadata.create_all(engine)
+    session = sessionmaker()
+    session.configure(bind=engine)
+    s = session()
+
+
+
 
 @app.get("/")
-def read_root():
+def index():
     return {"Hello": "World"}
 
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+@app.get("/download")
+def download():
+    start = time()
+    name = download_zip(url, query_parameters)
+    end = time()
+    time_elapsed = round(end - start, 2)
+    return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
+
+
+@app.get("/{code}")
+def read_item(code: int, filename=csv_file_name):
+    with open(filename, newline='') as f:
+        reader = csv.DictReader(f, delimiter=',')
+        for row in reader:
+            for field in row:
+                if field == code:
+                    print("True")
+                    result.append(row)
+    return {"Postal Code ": code, "Result ": result}
 
 
 if __name__ == '__main__':
-    import uvicorn
     uvicorn.run(app, host='0.0.0.0', port=5001)
