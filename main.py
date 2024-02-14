@@ -1,11 +1,12 @@
-import json
+from modal import Stub, web_endpoint, asgi_app
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
 from sqlalchemy.exc import SQLAlchemyError
-
 from database import create_db, Listing, session
+
+stub = Stub("fastapi-demo")
 
 app = FastAPI()
 
@@ -38,6 +39,10 @@ async def read_item(code: str):
         detail = str(e.__dict__['orig']) if hasattr(e, 'orig') else str(e)
         raise HTTPException(status_code=500, detail=detail)
 
+
+@asgi_app()
+def fastapi_app():
+    return app
 
 
 if __name__ == '__main__':

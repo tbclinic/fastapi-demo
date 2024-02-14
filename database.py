@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 from sqlalchemy.exc import IntegrityError
 from download import download_zip
 
-db_path = 'postalcode.db'
+db_path = './tmp/postalcode.db'
 engine = create_engine(f'sqlite:///{db_path}', echo=False)
 Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 session = Session()
