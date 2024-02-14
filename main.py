@@ -1,4 +1,4 @@
-from modal import Stub, asgi_app
+from modal import Stub, asgi_app, Image
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
@@ -10,6 +10,8 @@ stub = Stub("fastapi-demo")
 app = FastAPI()
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
+
+image = Image.debian_slim().pip_install("boto3")
 
 
 @app.get("/")
@@ -38,6 +40,7 @@ async def read_item(code: str):
         raise HTTPException(status_code=500, detail=detail)
 
 
+@stub.function(image=image)
 @asgi_app()
 def fastapi_app():
     return app
