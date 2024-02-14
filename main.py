@@ -1,4 +1,4 @@
-from modal import Stub, web_endpoint, asgi_app
+from modal import Stub, asgi_app
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
@@ -7,9 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from database import create_db, Listing, session
 
 stub = Stub("fastapi-demo")
-
 app = FastAPI()
-
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
 
