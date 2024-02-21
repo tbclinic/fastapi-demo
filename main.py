@@ -3,6 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
+from modal._types import typechecked
 from sqlalchemy.exc import SQLAlchemyError
 from database import create_db, Listing, session
 
@@ -11,7 +12,7 @@ app = FastAPI()
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
 
-image = Image.debian_slim().pip_install("boto3")
+image = Image.debian_slim().pip_install_from_requirements("requirements.txt")
 
 
 @app.get("/")

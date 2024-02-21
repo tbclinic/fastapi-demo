@@ -1,11 +1,13 @@
 from zipfile import ZipFile
 import requests
 
+db_path = './postalcode.db'
+file_name = "postalcode"
+
 
 def download_zip(link, parameters):
-    file_name = "postalcode"
     response = requests.get(link, params=parameters)
-    with open(f"./tmp/{file_name}.zip", mode="wb") as file:
+    with open(f"{file_name}.zip", mode="wb") as file:
         file.write(response.content)
         file.close()
     with ZipFile(f"{file_name}.zip", 'r') as zip:
