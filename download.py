@@ -4,6 +4,7 @@ import requests
 db_path = './postalcode.db'
 file_name = "postalcode"
 
+
 def download_zip(link, parameters):
     response = requests.get(link, params=parameters)
     with open(f"{file_name}.zip", mode="wb") as file:
@@ -22,4 +23,5 @@ def download_zip(link, parameters):
             print('Done!')
         else:
             print("No CSV file found in the ZIP.")
+    print('Creating a volume...')
     return csv_file_name
