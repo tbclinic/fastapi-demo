@@ -1,4 +1,4 @@
-from modal import Stub, asgi_app, Image
+from modal import Stub, asgi_app, Image, Volume
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
@@ -7,6 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from database import create_db, Listing, session
 
 stub = Stub("fastapi-demo")
+vol = Volume.persisted("my-volume")
 app = FastAPI()
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
@@ -20,9 +21,12 @@ async def index():
 
 
 @app.get("/download")
+@stub.function(volumes={"./": vol})
 async def download():
     start = time()
     name = create_db(url, query_parameters)
+    print('Creating a volume...')
+    vol.commit()
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
