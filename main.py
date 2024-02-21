@@ -3,7 +3,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
-from modal._types import typechecked
 from sqlalchemy.exc import SQLAlchemyError
 from database import create_db, Listing, session
 
