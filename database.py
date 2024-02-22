@@ -40,7 +40,7 @@ def create_db(url, query_parameters):
     def prepare_listing(row, id):
         return Listing(id=id, zipcode=row[2].zfill(7), state=row[6], city=row[7], address=row[8])
 
-    name = download_zip(url, query_parameters)
+    name = download_zip.local(url, query_parameters)
     print("Downloading zip file...")
 
     with open(f"{name}", encoding='utf-8', newline='') as csv_file:

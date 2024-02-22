@@ -1,10 +1,14 @@
 from zipfile import ZipFile
+from modal import Stub, Volume
 import requests
 
+vol = Volume.persisted("my-volume")
+stub = Stub("download")
 db_path = './postalcode.db'
 file_name = "postalcode"
 
 
+@stub.function(volumes={"/data": vol})
 def download_zip(link, parameters):
     response = requests.get(link, params=parameters)
     with open(f"{file_name}.zip", mode="wb") as file:

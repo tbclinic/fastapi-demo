@@ -1,4 +1,4 @@
-from modal import Stub, asgi_app, Image
+from modal import Stub, asgi_app, Image, Volume
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
