@@ -22,7 +22,7 @@ async def index():
 @app.get("/download")
 async def download():
     start = time()
-    name = create_db(url, query_parameters)
+    name = create_db.local(url, query_parameters)
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}

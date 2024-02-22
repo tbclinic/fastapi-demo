@@ -3,12 +3,42 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 from sqlalchemy.exc import IntegrityError
-from download import *
+from zipfile import ZipFile
+from modal import Stub, Volume
+import requests
+
+vol = Volume.persisted("my-volume")
+stub = Stub("download")
+db_path = './postalcode.db'
+file_name = "postalcode"
 
 engine = create_engine(f'sqlite:///{db_path}', echo=False)
 Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 session = Session()
 Base = declarative_base()
+
+
+@stub.function(volumes={"/data": vol})
+def download_zip(link, parameters):
+    response = requests.get(link, params=parameters)
+    with open(f"{file_name}.zip", mode="wb") as file:
+        file.write(response.content)
+        file.close()
+    with ZipFile(f"{file_name}.zip", 'r') as zip:
+        zipinfo = zip.infolist()
+        for item in zipinfo:
+            if item.filename.endswith('.csv'):
+                csv_file_name = item.filename
+                break
+
+        if csv_file_name is not None:
+            print('Extracting all the files now...')
+            zip.extractall()  # Extracting all files
+            print('Done!')
+        else:
+            print("No CSV file found in the ZIP.")
+    print('Creating a volume...')
+    return csv_file_name
 
 
 class Listing(Base):
@@ -32,6 +62,7 @@ class Listing(Base):
         }
 
 
+@stub.function(volumes={"/data": vol})
 def create_db(url, query_parameters):
     Base.metadata.drop_all(engine)
     print("Clear previous data...")
@@ -57,4 +88,5 @@ def create_db(url, query_parameters):
                     print(f"Skipping duplicate id: {index}")
 
     print("DB READY")
+    vol.commit()
     return name
