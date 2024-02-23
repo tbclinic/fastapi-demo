@@ -5,7 +5,8 @@ from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 from sqlalchemy.exc import IntegrityError
 from zipfile import ZipFile
 import requests
-from cloud import stub, vol
+from cloud import stub
+from modal import Volume
 
 db_path = './postalcode.db'
 file_name = "postalcode"
@@ -14,6 +15,8 @@ engine = create_engine(f'sqlite:///{db_path}', echo=False)
 Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 session = Session()
 Base = declarative_base()
+
+vol = Volume.persisted("my-volume")
 
 
 def download_zip(link, parameters):

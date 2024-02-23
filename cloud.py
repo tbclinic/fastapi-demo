@@ -1,5 +1,3 @@
-from modal import Stub, Volume
+from modal import Stub
 
 stub = Stub("fastapi-demo")
-
-vol = Volume.persisted("my-volume")
