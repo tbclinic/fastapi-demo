@@ -79,6 +79,8 @@ def create_db(url, query_parameters):
                 try:
                     listing = prepare_listing(row, index)
                     session.add(listing)
+                    if index % 10000 == 0:
+                        print(f"Processed {index} rows...")
                     session.commit()  # Commit inside the loop to catch exceptions per row
                 except IntegrityError:
                     session.rollback()  # Rollback the session to a clean state
