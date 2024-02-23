@@ -4,11 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base, scoped_session
 from sqlalchemy.exc import IntegrityError
 from zipfile import ZipFile
-from modal import Stub, Volume
 import requests
+from cloud import stub, vol
 
-vol = Volume.persisted("my-volume")
-stub = Stub("download")
 db_path = './postalcode.db'
 file_name = "postalcode"
 
@@ -18,7 +16,6 @@ session = Session()
 Base = declarative_base()
 
 
-@stub.function(volumes={"/data": vol})
 def download_zip(link, parameters):
     response = requests.get(link, params=parameters)
     with open(f"{file_name}.zip", mode="wb") as file:
@@ -71,7 +68,7 @@ def create_db(url, query_parameters):
     def prepare_listing(row, id):
         return Listing(id=id, zipcode=row[2].zfill(7), state=row[6], city=row[7], address=row[8])
 
-    name = download_zip.local(url, query_parameters)
+    name = download_zip(url, query_parameters)
     print("Downloading zip file...")
 
     with open(f"{name}", encoding='utf-8', newline='') as csv_file:

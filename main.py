@@ -5,8 +5,9 @@ from time import time
 import uvicorn
 from sqlalchemy.exc import SQLAlchemyError
 from database import create_db, Listing, session
+from cloud import stub
 
-stub = Stub("fastapi-demo")
+
 app = FastAPI()
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
