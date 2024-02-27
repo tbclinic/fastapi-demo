@@ -1,13 +1,13 @@
-from modal import Stub, asgi_app, Image, Volume
+from modal import Stub, asgi_app, Image
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
-from sqlalchemy.exc import SQLAlchemyError
-from database import create_db, Listing, session
-from cloud import stub
+from database import mongodb
 
 
+
+stub = Stub("fastapi-demo")
 app = FastAPI()
 url = 'https://www.post.japanpost.jp/zipcode/dl/utf/zip/utf_ken_all.zip'
 query_parameters = {"downloadformat": "csv"}
@@ -23,22 +23,22 @@ async def index():
 @app.get("/download")
 async def download():
     start = time()
-    name = create_db.local(url, query_parameters)
+    name = mongodb(url, query_parameters)
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
 
 
-@app.get("/{code}")
-async def read_item(code: str):
-    try:
-        results = session.query(Listing).filter_by(zipcode=code).all()
-        if not results:
-            raise HTTPException(status_code=404, detail="Item not found")
-        return jsonable_encoder([result.to_dict() for result in results])
-    except SQLAlchemyError as e:
-        detail = str(e.__dict__['orig']) if hasattr(e, 'orig') else str(e)
-        raise HTTPException(status_code=500, detail=detail)
+# @app.get("/{code}")
+# async def read_item(code: str):
+#     try:
+#         results = session.query(Listing).filter_by(zipcode=code).all()
+#         if not results:
+#             raise HTTPException(status_code=404, detail="Item not found")
+#         return jsonable_encoder([result.to_dict() for result in results])
+#     except SQLAlchemyError as e:
+#         detail = str(e.__dict__['orig']) if hasattr(e, 'orig') else str(e)
+#         raise HTTPException(status_code=500, detail=detail)
 
 
 @stub.function(image=image)
