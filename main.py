@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
-from database import query
+from database import query, checkdb
 
 
 stub = Stub("fastapi-demo")
@@ -27,6 +27,12 @@ async def download():
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
+
+
+@app.get("check")
+async def check():
+    msg = checkdb()
+    return {"message": msg}
 
 
 @app.get("/{code}")

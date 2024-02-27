@@ -1,5 +1,6 @@
 import csv
 import os
+from pymongo.server_api import ServerApi
 from python_settings import settings
 from pymongo.mongo_client import MongoClient
 from download import download_zip
@@ -9,7 +10,7 @@ from bson.json_util import dumps, loads
 os.environ["SETTINGS_MODULE"] = 'settings'
 
 uri = settings.URI
-client = MongoClient(uri, tlsCAFile=certifi.where())
+client = MongoClient(uri, tlsCAFile=certifi.where(), server_api=ServerApi('1'))
 db = client['database']
 collection = db['listings']
 
@@ -39,3 +40,12 @@ def mongodb(url, query_parameters):
 def query(myquery):
     cursor = collection.find(myquery)
     return loads(dumps(cursor))
+
+
+def checkdb():
+    try:
+        client.admin.command('ping')
+        print("OK")
+        return "OK"
+    except Exception as e:
+        return e
