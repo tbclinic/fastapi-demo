@@ -2,9 +2,9 @@ import csv
 import os
 from python_settings import settings
 from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
 from download import download_zip
 import certifi
+from bson.json_util import dumps
 
 os.environ["SETTINGS_MODULE"] = 'settings'
 
@@ -33,5 +33,11 @@ def mongodb(url, query_parameters):
             if len(row) > 8:  # Ensure the row has enough elements
                 listing = prepare_listing(row)
                 collection.insert_one(listing)  # Insert the document into MongoDB
-
     return name
+
+
+def query(myquery):
+    cursor = collection.find(myquery)
+    list_cur = list(cursor)
+    json_result = dumps(list_cur)
+    return json_result

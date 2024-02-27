@@ -3,8 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
-from database import mongodb
-
+from database import query
 
 
 stub = Stub("fastapi-demo")
@@ -23,22 +22,19 @@ async def index():
 @app.get("/download")
 async def download():
     start = time()
-    name = mongodb(url, query_parameters)
+    # name = mongodb(url, query_parameters)
+    name = "test"
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
 
 
-# @app.get("/{code}")
-# async def read_item(code: str):
-#     try:
-#         results = session.query(Listing).filter_by(zipcode=code).all()
-#         if not results:
-#             raise HTTPException(status_code=404, detail="Item not found")
-#         return jsonable_encoder([result.to_dict() for result in results])
-#     except SQLAlchemyError as e:
-#         detail = str(e.__dict__['orig']) if hasattr(e, 'orig') else str(e)
-#         raise HTTPException(status_code=500, detail=detail)
+@app.get("/{code}")
+async def read_item(code: str):
+    myquery = {"zipcode": code}
+    results = query(myquery)
+    # print(results)
+    return jsonable_encoder(results)
 
 
 @stub.function(image=image)
