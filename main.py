@@ -31,10 +31,13 @@ async def download():
 
 @app.get("/{code}")
 async def read_item(code: str):
-    myquery = {"zipcode": code}
+    myquery = {"zipcode": code.zfill(7)}
     results = query(myquery)
-    # print(results)
-    return jsonable_encoder(results)
+    for item in results:
+        if '_id' in item:
+            item['_id'] = str(item['_id'])
+    encoded_json = jsonable_encoder(results)
+    return encoded_json
 
 
 @stub.function(image=image)

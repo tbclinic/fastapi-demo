@@ -4,7 +4,7 @@ from python_settings import settings
 from pymongo.mongo_client import MongoClient
 from download import download_zip
 import certifi
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 
 os.environ["SETTINGS_MODULE"] = 'settings'
 
@@ -38,6 +38,4 @@ def mongodb(url, query_parameters):
 
 def query(myquery):
     cursor = collection.find(myquery)
-    list_cur = list(cursor)
-    json_result = dumps(list_cur)
-    return json_result
+    return loads(dumps(cursor))
