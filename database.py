@@ -30,11 +30,17 @@ def insert(url, query_parameters):
     print("Downloading zip file...")
 
     operations = []
-    batch_size = 10000
+    batch_size = 150000
+    update_interval = 10000
+    processed_rows = 0
 
     with open(f"{name}", encoding='utf-8', newline='') as csv_file:
         csv_reader = csv.reader(csv_file, quotechar='"')
         for row in csv_reader:
+            processed_rows += 1
+            if processed_rows % update_interval == 0:
+                print(f"Processed {processed_rows} rows...")  # Simple progress update
+
             if len(row) > 8:
                 listing = prepare_listing(row)
                 operations.append(InsertOne(listing))
@@ -42,6 +48,11 @@ def insert(url, query_parameters):
                 if len(operations) == batch_size:
                     collection.bulk_write(operations)
                     operations = []
+
+    if operations:  # Ensure any remaining operations are written to the database
+        collection.bulk_write(operations)
+
+    print(f"Finished processing. Total rows processed: {processed_rows}")
     return name
 
 
