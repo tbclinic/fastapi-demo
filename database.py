@@ -56,12 +56,18 @@ def checkdb():
         print("OK")
         return "OK"
     except Exception as e:
-        return e
+        error_message = str(e)
+        print(error_message)
+        return error_message
 
 
 def dropdb():
     try:
         collection.drop()
-        return f"The collection '{collection.name}' has been dropped."
+        msg = f"The collection '{collection.name}' has been dropped."
+        print(msg)
+        return msg
     except Exception as e:
-        return f"An error occurred: {e}"
+        msg = f"An error occurred: {e}"
+        print(msg)
+        return msg

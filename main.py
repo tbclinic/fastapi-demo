@@ -1,5 +1,5 @@
 from modal import Stub, asgi_app, Image
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
