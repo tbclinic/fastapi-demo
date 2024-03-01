@@ -28,19 +28,19 @@ async def download():
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
 
 
-@app.get("check")
+@app.get("/check")
 async def check():
     msg = checkdb()
     return {"message": msg}
 
 
-@app.get("drop")
-async def delete():
+@app.get("/drop")
+async def drop_db():
     msg = dropdb()
     return {"message": msg}
 
 
-@app.get("/{code}")
+@app.get("/query/{code}")
 async def read_item(code: str):
     myquery = {"zipcode": code.zfill(7)}
     results = query(myquery)
