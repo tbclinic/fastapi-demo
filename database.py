@@ -46,13 +46,15 @@ def insert(url, query_parameters):
                 operations.append(InsertOne(listing))
 
                 if len(operations) == batch_size:
+                    print("Bulk writing...")
                     collection.bulk_write(operations)
-                    print("Bulk Writing...")
+                    print("Bulk writing completed.")
                     operations = []
 
     if operations:  # Ensure any remaining operations are written to the database
-        collection.bulk_write(operations)
         print("Bulk Writing the remaining data...")
+        collection.bulk_write(operations)
+        print("Bulk writing completed.")
 
     print(f"Finished processing. Total rows processed: {processed_rows}")
     return name
