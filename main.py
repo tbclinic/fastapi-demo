@@ -3,8 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 from time import time
 import uvicorn
-from database import query, checkdb
-
+from database import query, checkdb, dropdb, insert
 
 stub = Stub("fastapi-demo")
 app = FastAPI()
@@ -22,8 +21,8 @@ async def index():
 @app.get("/download")
 async def download():
     start = time()
-    # name = mongodb(url, query_parameters)
-    name = "test"
+    name = insert(url, query_parameters)
+    # name = "test"
     end = time()
     time_elapsed = round(end - start, 2)
     return {"message": "Download completed.", "time": time_elapsed, "file_name": name}
@@ -32,6 +31,12 @@ async def download():
 @app.get("check")
 async def check():
     msg = checkdb()
+    return {"message": msg}
+
+
+@app.get("drop")
+async def delete():
+    msg = dropdb()
     return {"message": msg}
 
 

@@ -6,6 +6,7 @@ from pymongo.mongo_client import MongoClient
 from download import download_zip
 import certifi
 from bson.json_util import dumps, loads
+from pymongo.operations import InsertOne
 
 os.environ["SETTINGS_MODULE"] = 'settings'
 
@@ -24,16 +25,23 @@ def prepare_listing(row):
     }
 
 
-def mongodb(url, query_parameters):
+def insert(url, query_parameters):
     name = download_zip(url, query_parameters)
     print("Downloading zip file...")
+
+    operations = []
+    batch_size = 10000
 
     with open(f"{name}", encoding='utf-8', newline='') as csv_file:
         csv_reader = csv.reader(csv_file, quotechar='"')
         for row in csv_reader:
-            if len(row) > 8:  # Ensure the row has enough elements
+            if len(row) > 8:
                 listing = prepare_listing(row)
-                collection.insert_one(listing)  # Insert the document into MongoDB
+                operations.append(InsertOne(listing))
+
+                if len(operations) == batch_size:
+                    collection.bulk_write(operations)
+                    operations = []
     return name
 
 
@@ -49,3 +57,11 @@ def checkdb():
         return "OK"
     except Exception as e:
         return e
+
+
+def dropdb():
+    try:
+        collection.drop()
+        return f"The collection '{collection.name}' has been dropped."
+    except Exception as e:
+        return f"An error occurred: {e}"
