@@ -30,7 +30,7 @@ def insert(url, query_parameters):
     print("Downloading zip file...")
 
     operations = []
-    batch_size = 150000
+    batch_size = 100000
     update_interval = 10000
     processed_rows = 0
 
@@ -47,10 +47,12 @@ def insert(url, query_parameters):
 
                 if len(operations) == batch_size:
                     collection.bulk_write(operations)
+                    print("Bulk Writing...")
                     operations = []
 
     if operations:  # Ensure any remaining operations are written to the database
         collection.bulk_write(operations)
+        print("Bulk Writing the remaining data...")
 
     print(f"Finished processing. Total rows processed: {processed_rows}")
     return name
