@@ -68,7 +68,6 @@ def query(myquery):
 def checkdb():
     try:
         client.admin.command('ping')
-        print("OK")
         return "OK"
     except Exception as e:
         error_message = str(e)
